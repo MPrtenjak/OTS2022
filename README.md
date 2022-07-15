@@ -1,3 +1,3 @@
 # OTS2022-Blazor
 
-Primer Blazor programa za konkerenco OTS 2022
+Primer Blazor programa za konferenco OTS 2022
