@@ -1,0 +1,12 @@
+# User-specific files
+*.user
+
+# Output-folders
+bin/
+obj/
+publish/
+dist/
+
+# VS folders
+.vs/
+packages/

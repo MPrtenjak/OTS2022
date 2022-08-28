@@ -1,0 +1,1 @@
+@git checkout -- build-app\build-info.json

@@ -1,0 +1,159 @@
+﻿@page "/compare/{slideID:int?}"
+
+@implements IAsyncDisposable
+
+@layout OTSLayout
+
+@using System.Xml.Linq
+@using System.Xml.Serialization
+@using System.Xml.XPath
+
+@inject HttpClient Http
+
+<div id="keyCatcher" tabindex="-1" style="outline: none; font-size: @fontSizePercent" @onkeydown="e => KeyDown(e)">
+	@if (slides.Count > 0)
+	{
+		<div class="d-flex justify-content-between flex-wrap">
+			<span style="font-size: 75%; font-weight: 500;color: red;" class="me-2">
+				[@(currentSlide + 1)].
+			</span>
+			<span style="font-size: 150%; font-weight: 900;color: red;">
+				@slides[currentSlide].Caption
+			</span>
+			<span>
+				<button id="zoomOut" class="btn btn-primary me-2" @onclick="zoomOut"><span class="oi oi-zoom-out"></span></button>
+				<button id="percent" class="btn btn-primary me-2">@fontSizePercent</button>
+				<button id="zoomIn" class="btn btn-primary me-5" @onclick="zoomIn"><span class="oi oi-zoom-in"></span></button>
+
+				<button id="goBack" class="btn btn-primary me-2" @onclick="doPrev" disabled="@CanNotGoBack"><span class="oi oi-media-skip-backward"></span></button>
+				<button id="goFwd" class="btn btn-primary me-2" @onclick="doNext" disabled="@CanNotGoFwrd"><span class="oi oi-media-skip-forward"></span></button>
+			</span>
+		</div>
+		<hr />
+
+  	<DynamicComponent Type="@slides[currentSlide].SlideComponent" Parameters="@slideParameters()" />
+	}
+</div>
+
+@code {
+	[Parameter] public int? slideID { get; set; }
+
+	private List<SlideDTO> slides = new List<SlideDTO>();
+	private int currentSlide = 0;
+	private int fontSize = 100;
+
+	private bool CanGoBack => (currentSlide > 0);
+	private bool CanGoFwrd => (currentSlide < slides.Count - 1);
+	private bool CanNotGoBack => !CanGoBack;
+	private bool CanNotGoFwrd => !CanGoFwrd;
+	private string fontSizePercent => $"{fontSize}%";
+	private Dictionary<string, Action> keys2Action = new();
+
+	private GestureEventInterop? customEventInterop { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		var stringResult = await Http.GetStringAsync("sample-data/vue_blazor_compare.xml");
+		var xmlResult = XDocument.Parse(stringResult);
+
+		foreach (var slide in xmlResult.XPathSelectElements("//Slide"))
+			slides.Add(Slide.FromXElement(slide));
+
+		currentSlide = (slideID.HasValue && slideID.Value >= 1 && slideID.Value <= slides.Count)
+			? (slideID.Value - 1) : 0;
+
+		var fs = await JS.GetFromLocalStorage("fontSize");
+		fontSize = (string.IsNullOrWhiteSpace(fs)) ? 100 : int.Parse(fs);
+
+		keys2Action = new Dictionary<string, Action>()
+			{
+				{ "ArrowRight", doNext },
+				{ "PageUp", doNext },
+				{ "swipeleft", doNext },
+
+				{ "ArrowLeft", doPrev },
+				{ "PageDown", doPrev },
+				{ "swiperight", doPrev },
+
+				{ "AudioVolumeUp", zoomIn },
+				{ "AudioVolumeDown", zoomOut },
+			};
+	}
+
+	private IDictionary<string, object> slideParameters()
+	{
+		return new Dictionary<string, object>()
+		{
+			{ "SlideData", slides[currentSlide] }
+		};
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (!firstRender)
+			return;
+
+		customEventInterop = new(JS);
+		await customEventInterop.SetupGestureEventCallback(args => handleGestures(args));
+		await base.OnAfterRenderAsync(firstRender);
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (customEventInterop is not null)
+			await customEventInterop.TearDownGestureEventCallback();
+	}
+
+	public async void zoomOut()
+	{
+		if (fontSize > 30)
+			await changeFontSize(-10);
+	}
+
+	public async void zoomIn()
+	{
+		await changeFontSize(10);
+	}
+
+	private async Task changeFontSize(int delta)
+	{
+		fontSize += delta;
+		await JS.SetInLocalStorage("fontSize", fontSize.ToString());
+	}
+
+	private void doPageSlide(int offset)
+	{
+		currentSlide += offset;
+		StateHasChanged();
+		JS.ChangeURL($"compare/{currentSlide+1}");
+	}
+
+	public void doPrev()
+	{
+		if (CanGoBack)
+			doPageSlide(-1);
+	}
+
+	public void doNext()
+	{
+		if (CanGoFwrd)
+			doPageSlide(+1);
+	}
+
+	private void excuteInputAction(string action)
+	{
+		if (keys2Action.ContainsKey(action))
+			keys2Action[action]();
+	}
+
+	private void KeyDown(KeyboardEventArgs e)
+	{
+		excuteInputAction(e.Key);
+	}
+
+	private Task handleGestures(string args) {
+		excuteInputAction(args);
+
+		return Task.CompletedTask;
+	}
+}
