@@ -138,7 +138,8 @@
 
 @code {
   private string message = $"You loaded this page on 
-    {DateTime.Now.ToLongDateString()} {DateTime.Now.ToLongTimeString()}";
+    {DateTime.Now.ToLongDateString()} 
+    {DateTime.Now.ToLongTimeString()}";
 }
 ]]>
     </BlazorCode>
@@ -261,7 +262,9 @@
 <template>      
   <div>
     <p>{{ message }}</p>
-    <button v-on:click="reverseMessage">Reverse Message</button>
+    <button v-on:click="reverseMessage">
+      Reverse Message
+    </button>
   </div>
 </template>
 
@@ -274,7 +277,8 @@
     },
     methods: {
       reverseMessage: function () {
-        this.message = this.message.split('').reverse().join('')
+        this.message = this.message.split('')
+                           .reverse().join('')
       }
     }    
   }
@@ -285,7 +289,9 @@
       <![CDATA[
 <div>
   <p>@message</p>
-  <button @onclick="ReverseMessage">Reverse Message</button>
+  <button @onclick="ReverseMessage">
+    Reverse Message
+  </button>
 </div>
 
 @code {
@@ -293,7 +299,8 @@
 
   public void ReverseMessage()
   {
-    message = new string(message.ToCharArray().Reverse().ToArray());
+    message = new string(message.ToCharArray()
+                        .Reverse().ToArray());
   }
 }
 ]]>
@@ -497,6 +504,13 @@
     <td style="border-left: 2px dashed green; padding: 15px;">
       <b>Datoteke v podmapi _framework so stisnjene in pripravljene za prenos v stisnjeni obliki</b>
       <ul>
+        <li>Vse knjižnice so v treh oblikah
+          <ul>
+            <li><b>DLL</b> nestisnjena oblika</li>
+            <li><b>GZ</b> stisnjena oblika GZIP</li>
+            <li><b>BR</b> stisnjena oblika brotli</li>
+          </ul>
+        <li>
         <li>Tu so VSE .NET Core knjižnice, ki jih vaš projekt uporablja</li>
         <li>Tu so VSE ostele (Nuget) knjižnice, ki jih vaš projekt uporablja</li>
         <li>Tu je tudi vas C# koda vašega projekta</li>
@@ -586,7 +600,6 @@
         <li><b>Največje težave</b>
           <ol>
             <li>Velikost aplikacije</li>
-            <li>Težave z osveževanjem (caching elementov), predvsem pri PWA aplikacijah</li>
             <li>Težje delo z Javascript knjižnicami</li>
           </ol>
         </li>
@@ -597,6 +610,19 @@
             <li>Lažje razhroščevanje</li>
           </ol>
         </li>
+        <li style="padding-top: 15px;"><b>GitHub projekt</b>
+          <ul>
+            <li>Celotna prezentacija je dosegljiva preko github: <b><a href="https://github.com/MPrtenjak">https://github.com/MPrtenjak</a></b></li>
+            <li>"Živa" prezentacija: <b><a href="https://mnet.si/ots2022">https://mnet.si/ots2022</a></b></li>
+          </ul>
+        </li>
+        <li style="padding-top: 15px;"><b>GitHub pages - statične spletne strani(!)</b>
+          <ul>
+            <li>"Živa" prezentacija je dosegljiva preko <b>GitHub pages</b></li>
+            <li>S pomočjo <b>GitHube actions</b> in se avtomatično prevede in naloži ob vsaki spremembi izvorne kode</li>
+            <li><b><a href="https://mprtenjak.github.io/OTS2022-Blazor">https://mprtenjak.github.io/OTS2022-Blazor</a></b></li>
+          </ul>
+        </li>        
       </ul>
     </td>
     <td style="border-left: 2px dashed green; padding: 15px;">
@@ -612,12 +638,6 @@
             <li>github: <b>@MPrtenjak</b></li>
             <li>e.mail: <b>info@mnet.si</b></li>
             <li>web: <b><a href="https://mnet.si">https://mnet.si</a></b></li>
-          </ul>
-        </li>
-        <li style="padding-top: 15px;"><b>GitHub projekt</b>
-          <ul>
-            <li>Celotna prezentacija je dosegljiva preko github: <b><a href="https://github.com/MPrtenjak">https://github.com/MPrtenjak</a></b></li>
-            <li>"Živa" prezentacija: <b><a href="https://mnet.si/ots2022">https://mnet.si/ots2022</a></b></li>
           </ul>
         </li>
       </ul>
