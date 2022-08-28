@@ -301,7 +301,7 @@
       "url": "manifest.json"
     },
     {
-      "hash": "sha256-XSzZe9eo3xGJDACj7OQxabPNLMAcLynKupee49XFDXg=",
+      "hash": "sha256-5t3J41i0UOx0\/GIaY18vUuPLDouYhY69YQf2e+QVcKQ=",
       "url": "sample-data\/vue_blazor_compare.xml"
     },
     {
@@ -309,5 +309,5 @@
       "url": "sample-data\/weather.json"
     }
   ],
-  "version": "7m2D5aTf"
+  "version": "+rcH+4tQ"
 };
